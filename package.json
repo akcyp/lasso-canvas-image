@@ -1,0 +1,28 @@
+{
+  "name": "lasso-canvas",
+  "version": "1.0.0",
+  "description": "Lasso tool for HTML5 Canvas in Javascript",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akcyp/lasso-canvas.git"
+  },
+  "keywords": [
+    "html5",
+    "canvas",
+    "tool",
+    "lasso",
+    "polygon",
+    "select"
+  ],
+  "author": "akcyp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/akcyp/lasso-canvas/issues"
+  },
+  "homepage": "https://github.com/akcyp/lasso-canvas#readme"
+}
