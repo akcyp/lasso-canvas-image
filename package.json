@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akcyp/lasso-canvas.git"
+    "url": "git+https://github.com/akcyp/lasso-canvas-image.git"
   },
   "keywords": [
     "html5",
@@ -23,7 +23,7 @@
   "author": "akcyp",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/akcyp/lasso-canvas/issues"
+    "url": "https://github.com/akcyp/lasso-canvas-image/issues"
   },
-  "homepage": "https://github.com/akcyp/lasso-canvas#readme"
+  "homepage": "https://github.com/akcyp/lasso-canvas-image#readme"
 }
