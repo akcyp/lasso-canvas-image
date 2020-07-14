@@ -18,6 +18,7 @@
   <div>
     <div id="output1"></div>
     <div id="output2"></div>
+    <button>RESET</button>
   </div>
   <script>
     window.module = {};
@@ -30,7 +31,7 @@
     const $polygon = document.querySelector('polygon');
     $polygon.parentElement.setAttribute('width', $img.width);
     $polygon.parentElement.setAttribute('height', $img.height);
-    createLasso({
+    const lasso = createLasso({
       element: $img,
       radius: 10,
       onChange: (polygon) => {
@@ -41,6 +42,7 @@
         $out2.innerHTML = 'onUpdate(): ' + polygon
       }
     });
+    document.querySelector('button').addEventListener('click', () => lasso.reset());
   </script>
 </body>
 </html>

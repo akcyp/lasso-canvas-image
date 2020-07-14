@@ -8,7 +8,6 @@
  * @typedef {Object} LassoOptions
  * @property {HTMLImageElement} element
  * @property {number} radius
- * @property {number} fps
  * @property {(polygon: string) => void} onChange
  * @property {(polygon: string) => void} onUpdate
  */
@@ -26,7 +25,6 @@ function createLasso (options) {
   }
   options = Object.assign({
     radius: 5,
-    fps: 60,
     onChange: Function.prototype,
     onUpdate: Function.prototype
   }, options);
@@ -43,40 +41,52 @@ function createLasso (options) {
    */
   const path = [];
   let pathClosed = false;
+
+  /**
+   * @param {() => void} fn
+   */
+  const addCtxPath = (fn) => {
+    ctx.save();
+    ctx.beginPath();
+    fn();
+    ctx.closePath();
+    ctx.restore();
+  }
   /**
    * @param {number} x
    * @param {number} y
    */
   const drawPoint = (x, y) => {
-    ctx.beginPath();
-    ctx.arc(x, y, options.radius, 0, 2 * Math.PI);
-    ctx.stroke();
-    ctx.closePath();
+    addCtxPath(() => {
+      ctx.arc(x, y, options.radius, 0, 2 * Math.PI);
+      ctx.stroke();
+    });
 
-    ctx.beginPath();
-    ctx.moveTo(x - options.radius / 2, y - options.radius / 2);
-    ctx.lineTo(x + options.radius / 2, y + options.radius / 2);
-    ctx.stroke();
-    ctx.closePath();
+    addCtxPath(() => {
+      ctx.moveTo(x - options.radius / 2, y - options.radius / 2);
+      ctx.lineTo(x + options.radius / 2, y + options.radius / 2);
+      ctx.stroke();
+    });
 
-    ctx.beginPath();
-    ctx.moveTo(x + options.radius / 2, y - options.radius / 2);
-    ctx.lineTo(x - options.radius / 2, y + options.radius / 2);
-    ctx.stroke();
-    ctx.closePath();
+    addCtxPath(() => {
+      ctx.moveTo(x + options.radius / 2, y - options.radius / 2);
+      ctx.lineTo(x - options.radius / 2, y + options.radius / 2);
+      ctx.stroke();
+    });
   };
   /**
    * @param {Point} p1
    * @param {Point} p2
    */
   const drawLine = (p1, p2) => {
-    ctx.beginPath();
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
-    ctx.stroke();
-    ctx.closePath();
+    addCtxPath(() => {
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    });
   }
-  const draw = () => {
+  const nextFrame = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(options.element, 0, 0, canvas.width, canvas.height);
     for (let i = 0; i < path.length; i++) {
       const {x, y} = path[i];
@@ -89,33 +99,21 @@ function createLasso (options) {
       if (path.length > 1) {
         drawLine(path[0], path[path.length - 1]);
       }
-      ctx.beginPath();
+      addCtxPath(() => {
       ctx.moveTo(path[0].x, path[0].y);
-      for (let i = 1; i < path.length; i++) {
-        const {x, y} = path[i];
-        ctx.lineTo(x, y);
-      }
-      ctx.fillStyle = 'rgba(134, 228, 35, 0.45)';
-      ctx.fill();
-      ctx.closePath();
+        for (let i = 1; i < path.length; i++) {
+          const {x, y} = path[i];
+          ctx.lineTo(x, y);
+        }
+        ctx.fillStyle = 'rgba(134, 228, 35, 0.45)';
+        ctx.fill();
+      });
     } else if (path.length && !controllers.selectedPoint) {
       const {x, y} = getDistance(path[0], controllers.pos) <= options.radius ? path[0] : controllers.pos;
       drawPoint(x, y);
       drawLine(path[path.length - 1], {x, y});
     }
   };
-  const clear = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
-  let lastFrame = Date.now();
-  const nextFrame = () => {
-    const refreshFrameTime = Date.now() - lastFrame;
-    lastFrame = Date.now();
-    clear();
-    draw();
-    setTimeout(() => {
-      window.requestAnimationFrame(() => nextFrame());
-    }, Math.max(0, 1000 / options.fps - refreshFrameTime));
-  };
-  nextFrame();
 
   /**
    * @param {MouseEvent} e
@@ -138,8 +136,9 @@ function createLasso (options) {
     startPos: {x: 0, y: 0},
     pos: {x: 0, y: 0},
     selectedPoint: null
-  }
+  };
   canvas.addEventListener('mousedown', (e) => {
+    nextFrame();
     controllers.mousedown = true;
     controllers.startPos = getMousePosition(e);
     controllers.pos = getMousePosition(e);
@@ -158,6 +157,7 @@ function createLasso (options) {
         onPathUpdate();
       }
     }
+    nextFrame();
   });
   canvas.addEventListener('mouseup', () => {
     if (!controllers.selectedPoint) {
@@ -165,10 +165,11 @@ function createLasso (options) {
     } else if (controllers.selectedPoint === path[0]) {
       pathClosed = true;
     }
-    onPathChange();
-    onPathUpdate();
     controllers.mousedown = false;
     controllers.selectedPoint = null;
+    onPathChange();
+    onPathUpdate();
+    nextFrame();
   });
 
   /**
@@ -204,6 +205,15 @@ function createLasso (options) {
   function onPathUpdate () {
     const polygon = pathToString();
     options.onUpdate(polygon);
+  }
+  return {
+    reset() {
+      path.length = 0;
+      pathClosed = false;
+      nextFrame();
+      onPathChange();
+      onPathUpdate();
+    }
   }
 }
 
