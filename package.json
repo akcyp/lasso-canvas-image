@@ -1,7 +1,7 @@
 {
-  "name": "lasso-canvas",
+  "name": "lasso-canvas-image",
   "version": "1.0.0",
-  "description": "Lasso tool for HTML5 Canvas in Javascript",
+  "description": "Lasso tool for HTML5 Image in Javascript, using Canvas",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
@@ -16,6 +16,7 @@
     "canvas",
     "tool",
     "lasso",
+    "image",
     "polygon",
     "select"
   ],
