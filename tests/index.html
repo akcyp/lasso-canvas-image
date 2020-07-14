@@ -5,15 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image polygon selector</title>
 </head>
-<body>
-  <img src="./example.jpg">
+<body style="text-align: center;">
+  <div style="width: 49%;display: inline-block; position: relative;">
+    <img src="./example.jpg" style="width: 100%; height: 100%;">
+  </div>
+  <div style="width: 49%;display: inline-block; position: relative;">
+    <img src="./example.jpg" style="width: 100%; height: 100%;">
+    <svg style="width: 100%; height: 100%; position: absolute; left: 0; top: 0;">
+      <polygon fill="rgba(134, 228, 35, 0.45)" stroke="black" />
+    </svg>
+  </div>
+  <div>
+    <div id="output1"></div>
+    <div id="output2"></div>
+  </div>
   <script>
     window.module = {};
   </script>
   <script src="../index.js"></script>
   <script>
-    createLasso(document.querySelector('img'), (path) => console.log(path), {
-      radius: 10
+    const $img = document.querySelector('img');
+    const $out1 = document.querySelector('#output1');
+    const $out2 = document.querySelector('#output2');
+    const $polygon = document.querySelector('polygon');
+    $polygon.parentElement.setAttribute('width', $img.width);
+    $polygon.parentElement.setAttribute('height', $img.height);
+    createLasso({
+      element: $img,
+      radius: 10,
+      onChange: (polygon) => {
+        $out1.innerHTML = 'onChange(): ' + polygon,
+        $polygon.setAttribute('points', polygon);
+      },
+      onUpdate: (polygon) => {
+        $out2.innerHTML = 'onUpdate(): ' + polygon
+      }
     });
   </script>
 </body>
