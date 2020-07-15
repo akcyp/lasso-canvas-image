@@ -151,6 +151,9 @@ function createLasso (options) {
     selectedPoint: null,
     relativePoint: null
   };
+  canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
   canvas.addEventListener('mousedown', (e) => {
     nextFrame();
     controllers.mousedown = true;
@@ -170,11 +173,25 @@ function createLasso (options) {
     }
     nextFrame();
   });
-  canvas.addEventListener('mouseup', () => {
-    if (!controllers.selectedPoint) {
-      path.push({x: controllers.pos.x, y: controllers.pos.y});
-    } else if (controllers.selectedPoint === path[0]) {
-      pathClosed = true;
+  canvas.addEventListener('mouseup', (e) => {
+    if (e.button === 2) {
+      if (controllers.selectedPoint) {
+        path.splice(path.indexOf(controllers.selectedPoint), 1);
+      } else {
+        const pointToRemove = path.find((p1) => getDistance(p1, controllers.pos) <= options.radius);
+        if (pointToRemove) {
+          path.splice(path.indexOf(pointToRemove), 1);
+        }
+      }
+    } else {
+      if (!controllers.selectedPoint) {
+        path.push({x: controllers.pos.x, y: controllers.pos.y});
+      } else if (controllers.selectedPoint === path[0]) {
+        pathClosed = true;
+      }
+    }
+    if (path.length < 3) {
+      pathClosed = false;
     }
     controllers.mousedown = false;
     controllers.selectedPoint = null;
