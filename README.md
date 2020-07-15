@@ -39,6 +39,8 @@ lasso.reset();
 
 Check out this [example](tests/index.html)
 
+[![Edit lass-canvas-image](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lasso-canvas-image-cboun?fontsize=14&hidenavigation=1&theme=dark&view=preview)
+
 ## Syntax
 
 ```ts
