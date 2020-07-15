@@ -117,16 +117,24 @@ function createLasso (options) {
 
   /**
    * @param {MouseEvent} e
+   * @param {boolean} [shiftSensitive]
    */
-  const getMousePosition = (e) => {
+  const getMousePosition = (e, shiftSensitive = true) => {
     const { clientX, clientY } = e;
     const rect = canvas.getBoundingClientRect();
     const ret = {
       x: clientX - rect.left,
       y: clientY - rect.top
     };
-    if (e.shiftKey) {
-      straightenLine(ret);
+    if (shiftSensitive ? e.shiftKey : false) {
+      if (!controllers.relativePoint && path.length) {
+        controllers.relativePoint = path
+          .filter(p => p !== controllers.selectedPoint)
+          .reduce((a, b) => getDistance(ret, a) < getDistance(ret, b) ? a : b);
+      }
+      straightenLine(ret, controllers.relativePoint);
+    } else {
+      controllers.relativePoint = null;
     }
     return ret;
   }
@@ -135,12 +143,13 @@ function createLasso (options) {
     mousedown: false,
     startPos: {x: 0, y: 0},
     pos: {x: 0, y: 0},
-    selectedPoint: null
+    selectedPoint: null,
+    relativePoint: null
   };
   canvas.addEventListener('mousedown', (e) => {
     nextFrame();
     controllers.mousedown = true;
-    controllers.startPos = getMousePosition(e);
+    controllers.startPos = getMousePosition(e, false);
     controllers.pos = getMousePosition(e);
 
     controllers.selectedPoint = path.find((p1) => getDistance(p1, controllers.pos) <= options.radius) || null;
@@ -151,9 +160,6 @@ function createLasso (options) {
       if (controllers.selectedPoint) {
         controllers.selectedPoint.x = controllers.pos.x;
         controllers.selectedPoint.y = controllers.pos.y;
-        if (e.shiftKey) {
-          straightenLine(controllers.selectedPoint);
-        }
         onPathUpdate();
       }
     }
@@ -167,6 +173,7 @@ function createLasso (options) {
     }
     controllers.mousedown = false;
     controllers.selectedPoint = null;
+    controllers.relativePoint = null;
     onPathChange();
     onPathUpdate();
     nextFrame();
@@ -174,18 +181,18 @@ function createLasso (options) {
 
   /**
    * @param {Point} point
+   * @param {Point} [relative]
    */
-  function straightenLine (point) {
-    let lastPoint = path[path.length - 1];
-    if (point === lastPoint) {
-      lastPoint = path[path.length - 2];
+  function straightenLine (point, relative) {
+    if (!relative) {
+      return;
     }
-    const dx = Math.abs(lastPoint.x - point.x);
-    const dy = Math.abs(lastPoint.y - point.y);
+    const dx = Math.abs(relative.x - point.x);
+    const dy = Math.abs(relative.y - point.y);
     if (dx > dy) {
-      point.y = lastPoint.y;
+      point.y = relative.y;
     } else {
-      point.x = lastPoint.x;
+      point.x = relative.x;
     }
   }
   /**
