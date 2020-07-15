@@ -33,6 +33,7 @@ const lasso = createLasso({
 
 // Methods
 lasso.reset();
+lasso.setPath('100,100 300,100 200,200');
 ```
 
 ## Examples

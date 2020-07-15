@@ -114,6 +114,11 @@ function createLasso (options) {
       drawLine(path[path.length - 1], {x, y});
     }
   };
+  if (options.element.complete && options.element.naturalHeight !== 0) {
+    nextFrame();
+  } else {
+    options.element.addEventListener('load', () => nextFrame());
+  }
 
   /**
    * @param {MouseEvent} e
@@ -217,6 +222,21 @@ function createLasso (options) {
     reset() {
       path.length = 0;
       pathClosed = false;
+      nextFrame();
+      onPathChange();
+      onPathUpdate();
+    },
+    /**
+     * @param {string} polygon
+     */
+    setPath (polygon) {
+      const newPath = polygon.split(' ').map(s => {
+        const [x, y] = s.split(',');
+        return {x: parseInt(x, 10), y: parseInt(y, 10)};
+      });
+      path.length = 0;
+      path.push(...newPath);
+      pathClosed = true;
       nextFrame();
       onPathChange();
       onPathUpdate();

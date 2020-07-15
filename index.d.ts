@@ -7,6 +7,7 @@ interface ILassoOptions {
 
 interface LassoInstance {
   reset: () => void;
+  setPath: (polygon: string) => void;
 }
 
 function createLasso (options: ILassoOptions): LassoInstance;
