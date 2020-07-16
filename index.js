@@ -34,7 +34,6 @@ function createLasso (options) {
   // Replace elements
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  options.element.parentElement.replaceChild(canvas, options.element);
 
   /**
    * @type {Point[]}
@@ -213,6 +212,7 @@ function createLasso (options) {
   function onLoad () {
     canvas.width = options.element.width;
     canvas.height = options.element.height;
+    options.element.parentElement.replaceChild(canvas, options.element);
     nextFrame();
   }
   /**
