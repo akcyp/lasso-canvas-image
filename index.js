@@ -10,6 +10,7 @@
  * @property {number} radius
  * @property {(polygon: string) => void} onChange
  * @property {(polygon: string) => void} onUpdate
+ * @property {boolean} enabled
  */
 
 /**
@@ -26,7 +27,8 @@ function createLasso (options) {
   options = Object.assign({
     radius: 5,
     onChange: Function.prototype,
-    onUpdate: Function.prototype
+    onUpdate: Function.prototype,
+    enabled: true
   }, options);
 
   // Replace elements
@@ -153,6 +155,9 @@ function createLasso (options) {
     e.preventDefault();
   });
   canvas.addEventListener('mousedown', (e) => {
+    if (!options.enabled) {
+      return;
+    }
     nextFrame();
     controllers.mousedown = true;
     controllers.startPos = getMousePosition(e, false);
@@ -161,6 +166,9 @@ function createLasso (options) {
     controllers.selectedPoint = path.find((p1) => getDistance(p1, controllers.pos) <= options.radius) || null;
   });
   canvas.addEventListener('mousemove', (e) => {
+    if (!options.enabled) {
+      return;
+    }
     controllers.pos = getMousePosition(e);
     if (controllers.mousedown) {
       if (controllers.selectedPoint) {
@@ -172,6 +180,9 @@ function createLasso (options) {
     nextFrame();
   });
   canvas.addEventListener('mouseup', (e) => {
+    if (!options.enabled) {
+      return;
+    }
     if (e.button === 2) {
       if (controllers.selectedPoint) {
         path.splice(path.indexOf(controllers.selectedPoint), 1);
@@ -260,6 +271,20 @@ function createLasso (options) {
       nextFrame();
       onPathChange();
       onPathUpdate();
+    },
+    enable () {
+      options.enabled = true;
+      nextFrame();
+    },
+    disable () {
+      if (!pathClosed) {
+        path.length = 0;
+        pathClosed = true;
+        onPathChange();
+        onPathUpdate();
+        nextFrame();
+      }
+      options.enabled = false;
     }
   }
 }

@@ -34,6 +34,9 @@ const lasso = createLasso({
 // Methods
 lasso.reset();
 lasso.setPath('100,100 300,100 200,200');
+
+lasso.disable();
+lasso.enable();
 ```
 
 ## Examples
@@ -46,10 +49,11 @@ Check out this [example](http://akcyp.github.io/lasso-canvas-image/index.html)
 
 ```ts
 function createLasso ({
-  element: HTMLImageElement;
-  radius?: number;
-  onChange?: (polygon: string) => void;
-  onUpdate?: (polygon: string) => void;
+  element: HTMLImageElement,
+  radius?: number,
+  onChange?: (polygon: string) => void,
+  onUpdate?: (polygon: string) => void,
+  enabled?: boolean
 })
 ```
 
@@ -59,3 +63,4 @@ Options
 - `radius` The radius of the circle's dots on the canvas
 - `onChange` Runs when the selected area is updated or points are moved by the user
 - `onUpdate` Runs when the selected area is updated
+- `enabled` defaults to true
