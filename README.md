@@ -41,7 +41,7 @@ lasso.enable();
 
 ## Examples
 
-Check out this [example](http://akcyp.github.io/lasso-canvas-image/index.html)
+Check out this [example](https://akcyp.github.io/lasso-canvas-image/)
 
 [![Edit lass-canvas-image](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lasso-canvas-image-cboun?fontsize=14&hidenavigation=1&theme=dark&view=preview)
 
