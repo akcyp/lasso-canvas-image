@@ -32,8 +32,6 @@ function createLasso (options) {
   // Replace elements
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = options.element.width;
-  canvas.height = options.element.height;
   options.element.parentElement.replaceChild(canvas, options.element);
 
   /**
@@ -115,9 +113,9 @@ function createLasso (options) {
     }
   };
   if (options.element.complete && options.element.naturalHeight !== 0) {
-    nextFrame();
+    onLoad();
   } else {
-    options.element.addEventListener('load', () => nextFrame());
+    options.element.addEventListener('load', () => onLoad());
   }
 
   /**
@@ -201,6 +199,11 @@ function createLasso (options) {
     nextFrame();
   });
 
+  function onLoad () {
+    canvas.width = options.element.width;
+    canvas.height = options.element.height;
+    nextFrame();
+  }
   /**
    * @param {Point} point
    * @param {Point} [relative]
