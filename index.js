@@ -40,6 +40,7 @@ function createLasso (options) {
    */
   const path = [];
   let pathClosed = false;
+  let lastEvent = 0;
 
   /**
    * @param {() => void} fn
@@ -120,11 +121,19 @@ function createLasso (options) {
   }
 
   /**
-   * @param {MouseEvent} e
+   * @param {MouseEvent | TouchEvent} e
    * @param {boolean} [shiftSensitive]
    */
   const getMousePosition = (e, shiftSensitive = true) => {
-    const { clientX, clientY } = e;
+    let clientX, clientY;
+    if (e instanceof MouseEvent) {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    } else {
+      const tEvent = e.touches[0];
+      clientX = tEvent.clientX;
+      clientY = tEvent.clientY;
+    }
     const rect = canvas.getBoundingClientRect();
     const ret = {
       x: clientX - rect.left,
@@ -153,21 +162,23 @@ function createLasso (options) {
   canvas.addEventListener('contextmenu', (e) => {
     e.preventDefault();
   });
-  canvas.addEventListener('mousedown', (e) => {
-    if (!options.enabled) {
+  ['mousedown', 'touchstart'].forEach(event => canvas.addEventListener(event, /** @param {MouseEvent | TouchEvent} e */ (e) => {
+    if (!options.enabled || Date.now() - lastEvent < 10) {
       return;
     }
+    lastEvent = Date.now();
     nextFrame();
     controllers.mousedown = true;
     controllers.startPos = getMousePosition(e, false);
     controllers.pos = getMousePosition(e);
 
     controllers.selectedPoint = path.find((p1) => getDistance(p1, controllers.pos) <= options.radius) || null;
-  });
-  canvas.addEventListener('mousemove', (e) => {
-    if (!options.enabled) {
+  }));
+  ['mousemove', 'touchmove'].forEach(event => canvas.addEventListener(event, /** @param {MouseEvent | TouchEvent} e */ (e) => {
+    if (!options.enabled || Date.now() - lastEvent < 10) {
       return;
     }
+    lastEvent = Date.now();
     controllers.pos = getMousePosition(e);
     if (controllers.mousedown) {
       if (controllers.selectedPoint) {
@@ -177,12 +188,13 @@ function createLasso (options) {
       }
     }
     nextFrame();
-  });
-  canvas.addEventListener('mouseup', (e) => {
-    if (!options.enabled) {
+  }));
+  ['mouseup', 'touchend', 'touchcancel'].forEach(event => canvas.addEventListener(event, /** @param {MouseEvent | TouchEvent} e */  (e) => {
+    if (!options.enabled || Date.now() - lastEvent < 10) {
       return;
     }
-    if (e.button === 2) {
+    lastEvent = Date.now();
+    if (e instanceof MouseEvent && e.button === 2) {
       if (controllers.selectedPoint) {
         path.splice(path.indexOf(controllers.selectedPoint), 1);
       } else {
@@ -207,7 +219,7 @@ function createLasso (options) {
     onPathChange();
     onPathUpdate();
     nextFrame();
-  });
+  }));
 
   function onLoad () {
     canvas.width = options.element.width;
