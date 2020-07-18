@@ -143,15 +143,17 @@ function createLasso (options) {
       x: clientX - rect.left,
       y: clientY - rect.top
     };
-    if (shiftSensitive ? e.shiftKey : false) {
+    if (e.shiftKey) {
       if (!controllers.relativePoint && path.length) {
         controllers.relativePoint = path
           .filter(p => p !== controllers.selectedPoint)
           .reduce((a, b) => getDistance(ret, a) < getDistance(ret, b) ? a : b);
       }
-      straightenLine(ret, controllers.relativePoint);
     } else {
       controllers.relativePoint = null;
+    }
+    if (shiftSensitive && controllers.relativePoint) {
+      straightenLine(ret, controllers.relativePoint);
     }
     return ret;
   }
@@ -236,9 +238,6 @@ function createLasso (options) {
    * @param {Point} [relative]
    */
   function straightenLine (point, relative) {
-    if (!relative) {
-      return;
-    }
     const dx = Math.abs(relative.x - point.x);
     const dy = Math.abs(relative.y - point.y);
     if (dx > dy) {
