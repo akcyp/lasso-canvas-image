@@ -4,6 +4,12 @@ Polygon selecting tool for HTML5 Image Element
 
 ![View](example.jpg)
 
+## Note
+
+This package has been turned into a responsive react component and will no longer be supported.
+
+Check out newest [version](https://github.com/akcyp/react-lasso-select)!
+
 ## Instalation
 
 ```bash
